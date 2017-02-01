@@ -50,6 +50,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'sikshaportal.urls'
 
+AUTH_USER_MODEL = 'app.SikshaUser'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
