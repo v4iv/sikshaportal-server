@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
 from app.forms import SikshaUserChangeForm, SikshaUserCreationForm
-from app.models import SikshaUser
+from app.models import SikshaUser, SikshaUserProfile
 
 
 class SikshaUserAdmin(UserAdmin):
@@ -34,3 +34,4 @@ class SikshaUserAdmin(UserAdmin):
 
 
 admin.site.register(SikshaUser, SikshaUserAdmin)
+admin.site.register(SikshaUserProfile)

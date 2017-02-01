@@ -2,6 +2,7 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.core.mail import send_mail
 from django.db import models
+from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 
 from django.utils import timezone
@@ -83,3 +84,34 @@ class SikshaUser(AbstractBaseUser, PermissionsMixin):
         :param from_email: the senders email.
         """
         send_mail(subject, message, from_email, [self.email])
+
+
+class SikshaUserProfile(models.Model):
+    user = models.OneToOneField(SikshaUser, on_delete=models.CASCADE, to_field='email', unique=True)
+    display_picture = models.ImageField(upload_to="uploads/displaypictures", default="uploads/displaypictures/male-silhouette.jpg")
+    MALE = 'M'
+    FEMALE = 'F'
+    UNKNOWN = 'U'
+    SEX_CHOICES = (
+        (UNKNOWN, 'Do Not Wish To Disclose'),
+        (MALE, 'Male'),
+        (FEMALE, 'Female'),
+    )
+    date_of_birth = models.DateField(blank=True, null=True)
+    gender = models.CharField(max_length=1, choices=SEX_CHOICES, default=UNKNOWN)
+
+    class Meta:
+        verbose_name = _('user profile')
+        verbose_name_plural = _('user profiles')
+
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            SikshaUserProfile.objects.create(user=instance)
+
+    post_save.connect(create_user_profile, sender=SikshaUser)
+
+    def create(self):
+        self.save()
+
+    def __str__(self):
+        return self.user.get_full_name()
